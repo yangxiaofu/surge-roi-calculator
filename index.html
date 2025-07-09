@@ -64,6 +64,16 @@
             cursor: pointer;
             border: none;
         }
+        
+        .industry-btn.active {
+            background-color: #ff6319;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .industry-btn.active .text-slate-600 {
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-inter">
@@ -80,6 +90,44 @@
                 </div>
             </div>
 
+            <!-- Industry Section Selector -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-nvent-dark-gray mb-4">SELECT YOUR INDUSTRY</h2>
+                <div id="industry-description" class="bg-gradient-to-r from-nvent-orange to-nvent-red text-white font-semibold px-6 py-3 rounded-lg shadow-lg mb-6 text-center">
+                    <span class="text-sm uppercase tracking-wider">CLICK ON YOUR INDUSTRY TO POPULATE THE CALCULATOR WITH TYPICAL VALUES</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <button id="bess-btn" class="industry-btn bg-white hover:bg-nvent-orange hover:text-white border-2 border-nvent-orange rounded-lg p-6 transition-all duration-300 group">
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">🔋</div>
+                            <h3 class="text-lg font-semibold">BESS</h3>
+                            <p class="text-sm text-slate-600 group-hover:text-white">BATTERY ENERGY STORAGE SYSTEMS</p>
+                        </div>
+                    </button>
+                    <button id="renewables-btn" class="industry-btn bg-white hover:bg-nvent-orange hover:text-white border-2 border-nvent-orange rounded-lg p-6 transition-all duration-300 group">
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">🌱</div>
+                            <h3 class="text-lg font-semibold">RENEWABLES</h3>
+                            <p class="text-sm text-slate-600 group-hover:text-white">SOLAR & WIND FARMS</p>
+                        </div>
+                    </button>
+                    <button id="microgrid-btn" class="industry-btn bg-white hover:bg-nvent-orange hover:text-white border-2 border-nvent-orange rounded-lg p-6 transition-all duration-300 group">
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">⚡</div>
+                            <h3 class="text-lg font-semibold">MICROGRID</h3>
+                            <p class="text-sm text-slate-600 group-hover:text-white">DISTRIBUTED ENERGY SYSTEMS</p>
+                        </div>
+                    </button>
+                    <button id="datacenter-btn" class="industry-btn bg-white hover:bg-nvent-orange hover:text-white border-2 border-nvent-orange rounded-lg p-6 transition-all duration-300 group">
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">🏢</div>
+                            <h3 class="text-lg font-semibold">DATA CENTER</h3>
+                            <p class="text-sm text-slate-600 group-hover:text-white">HYPERSCALE DATA CENTERS</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
             <!-- Main Content Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
                 <!-- Left Column: Inputs -->
@@ -92,7 +140,7 @@
                                 <label class="block text-sm font-medium text-slate-700 mb-2">ERICO EDT2 Unit Cost</label>
                                 <div class="relative">
                                     <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">$</span>
-                                    <input type="number" id="ericoUnitCost" value="350" 
+                                    <input type="number" id="ericoUnitCost" value="150" 
                                            class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-nvent-orange focus:border-transparent">
                                 </div>
                             </div>
@@ -100,7 +148,7 @@
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Competitor Unit Cost</label>
                                 <div class="relative">
                                     <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">$</span>
-                                    <input type="number" id="competitorUnitCost" value="250" 
+                                    <input type="number" id="competitorUnitCost" value="100" 
                                            class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-nvent-orange focus:border-transparent">
                                 </div>
                             </div>
@@ -111,7 +159,6 @@
                                     <input type="number" id="installCost" value="150" 
                                            class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-nvent-orange focus:border-transparent">
                                 </div>
-                                <p class="text-sm text-slate-500 mt-1">Note: ERICO may not need external fusing</p>
                             </div>
                         </div>
                     </div>
@@ -236,19 +283,6 @@
                         </div>
                     </div>
 
-                    <!-- Section 4: Summary & Value Proposition -->
-                    <div class="bg-white rounded-lg shadow-lg p-6">
-                        <h3 class="text-lg font-semibold text-nvent-dark-gray mb-4">Financial Summary</h3>
-                        <div class="prose text-slate-600" id="summaryText">
-                            <p>
-                                While the ERICO EDT2 requires an additional investment of <strong class="text-nvent-orange">$100</strong> 
-                                compared to the competitor, this investment pays for itself immediately. 
-                                The <strong>Transient Discriminating (TD) Technology</strong> prevents failure events 
-                                that would cost <strong class="text-nvent-red">$10,500</strong>, delivering an 
-                                exceptional <strong class="text-nvent-gold">10,400% ROI</strong> on your additional investment.
-                            </p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

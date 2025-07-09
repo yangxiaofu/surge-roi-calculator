@@ -1,3 +1,47 @@
+// INDUSTRY PRESET DATA BASED ON DATA_POINTS.MD
+const industryPresets = {
+    bess: {
+        name: 'BATTERY ENERGY STORAGE SYSTEMS',
+        ericoUnitCost: 150,
+        competitorUnitCost: 100,
+        installCost: 150,
+        downtimeCostPerHour: 5000,
+        downtimeHours: 6,
+        equipmentDamageCost: 15000,
+        description: 'FREQUENT SWITCHING DURING CHARGE/DISCHARGE CYCLES, GRID SYNCHRONIZATION EVENTS, AND POWER CONDITIONING OPERATIONS CREATE TRANSIENT SURGES THAT THREATEN INVERTER AND CONTROL SYSTEM RELIABILITY'
+    },
+    renewables: {
+        name: 'SOLAR & WIND FARMS',
+        ericoUnitCost: 150,
+        competitorUnitCost: 100,
+        installCost: 150,
+        downtimeCostPerHour: 3000,
+        downtimeHours: 4,
+        equipmentDamageCost: 8000,
+        description: 'INVERTER SWITCHING DURING POWER CONVERSION, GRID CONNECTION/DISCONNECTION EVENTS, AND MPPT TRACKING OPERATIONS GENERATE TRANSIENTS THAT CAN DAMAGE POWER ELECTRONICS AND REDUCE ENERGY YIELD'
+    },
+    microgrid: {
+        name: 'DISTRIBUTED ENERGY SYSTEMS',
+        ericoUnitCost: 150,
+        competitorUnitCost: 100,
+        installCost: 150,
+        downtimeCostPerHour: 4000,
+        downtimeHours: 5,
+        equipmentDamageCost: 12000,
+        description: 'ISLANDING OPERATIONS, LOAD TRANSFER SWITCHING, AND GENERATOR SYNCHRONIZATION EVENTS CREATE COMPLEX TRANSIENT CONDITIONS THAT THREATEN DISTRIBUTED ENERGY RESOURCE COORDINATION AND GRID STABILITY'
+    },
+    datacenter: {
+        name: 'HYPERSCALE DATA CENTERS',
+        ericoUnitCost: 150,
+        competitorUnitCost: 100,
+        installCost: 150,
+        downtimeCostPerHour: 100000,
+        downtimeHours: 2,
+        equipmentDamageCost: 50000,
+        description: 'UPS TRANSFER SWITCHING, POWER DISTRIBUTION UNIT OPERATIONS, AND SERVER LOAD FLUCTUATIONS GENERATE TRANSIENTS THAT CAN TRIGGER CASCADING FAILURES IN MISSION-CRITICAL COMPUTING INFRASTRUCTURE'
+    }
+};
+
 // ROI Calculator Logic
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize slider synchronization
@@ -5,6 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add event listeners to all inputs
     addEventListeners();
+    
+    // Add industry section event listeners
+    addIndustryEventListeners();
     
     // Perform initial calculation
     calculate();
@@ -56,6 +103,68 @@ function addEventListeners() {
     inputs.forEach(id => {
         document.getElementById(id).addEventListener('input', calculate);
     });
+}
+
+function addIndustryEventListeners() {
+    // Add click event listeners to industry buttons
+    const industryButtons = ['bess-btn', 'renewables-btn', 'microgrid-btn', 'datacenter-btn'];
+    
+    industryButtons.forEach(buttonId => {
+        const button = document.getElementById(buttonId);
+        const industryKey = buttonId.replace('-btn', '');
+        
+        button.addEventListener('click', function() {
+            loadIndustryPreset(industryKey);
+            setActiveIndustryButton(buttonId);
+        });
+    });
+}
+
+function loadIndustryPreset(industryKey) {
+    const preset = industryPresets[industryKey];
+    if (!preset) return;
+    
+    // Update all input fields with preset values
+    document.getElementById('ericoUnitCost').value = preset.ericoUnitCost;
+    document.getElementById('competitorUnitCost').value = preset.competitorUnitCost;
+    document.getElementById('installCost').value = preset.installCost;
+    document.getElementById('downtimeCostInput').value = preset.downtimeCostPerHour;
+    document.getElementById('downtimeCostSlider').value = preset.downtimeCostPerHour;
+    document.getElementById('downtimeHoursInput').value = preset.downtimeHours;
+    document.getElementById('downtimeHoursSlider').value = preset.downtimeHours;
+    document.getElementById('equipmentDamageCost').value = preset.equipmentDamageCost;
+    
+    // Update section description to show current selection
+    updateSectionDescription(preset.name, preset.description);
+    
+    // Recalculate with new values
+    calculate();
+}
+
+function setActiveIndustryButton(activeButtonId) {
+    // Remove active class from all buttons
+    const allButtons = document.querySelectorAll('.industry-btn');
+    allButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Add active class to clicked button
+    document.getElementById(activeButtonId).classList.add('active');
+}
+
+function updateSectionDescription(name, description) {
+    // Update the section selector description text
+    const selectorDescription = document.getElementById('industry-description');
+    if (selectorDescription) {
+        selectorDescription.innerHTML = `
+            <div class="flex items-center justify-center space-x-2">
+                <span class="text-lg">⚡</span>
+                <span class="text-sm uppercase tracking-wider font-bold">CURRENT SELECTION:</span>
+                <span class="text-base font-extrabold">${name}</span>
+            </div>
+            <div class="text-sm mt-2 italic opacity-90">${description}</div>
+        `;
+    }
 }
 
 function calculate() {
