@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERICO EDT2 ROI & TCO Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'nvent-orange': '#ff6319',
+                        'nvent-red': '#c4262e',
+                        'nvent-dark-red': '#772432',
+                        'nvent-gold': '#eeaf00',
+                        'nvent-dark-gray': '#3D3E3F',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .bar-animation {
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .slider-sync {
+            appearance: none;
+            background: linear-gradient(to right, #ff6319, #ff6319);
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider-sync::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff6319;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+        
+        .slider-sync::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff6319;
+            cursor: pointer;
+            border: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-inter">
+    <div class="min-h-screen p-4 md:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold text-nvent-dark-gray">ERICO EDT2 ROI & TCO Calculator</h1>
+                        <p class="text-slate-600 mt-2">Demonstrate the financial advantage of Transient Discriminating Technology</p>
+                    </div>
+                    <img src="ERICO.png" alt="ERICO Logo" class="h-12 md:h-16">
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <!-- Left Column: Inputs -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Section 1: Initial Investment -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-xl font-semibold text-nvent-dark-gray mb-4">Initial Investment</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">ERICO EDT2 Unit Cost</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">$</span>
+                                    <input type="number" id="ericoUnitCost" value="350" 
+                                           class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-nvent-orange focus:border-transparent">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Competitor Unit Cost</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">$</span>
+                                    <input type="number" id="competitorUnitCost" value="250" 
+                                           class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-nvent-orange focus:border-transparent">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Installation & Extra Costs</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">$</span>
+                                    <input type="number" id="installCost" value="150" 
+                                           class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-nvent-orange focus:border-transparent">
+                                </div>
+                                <p class="text-sm text-slate-500 mt-1">Note: ERICO may not need external fusing</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Cost of a Single Failure Event -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-xl font-semibold text-nvent-dark-gray mb-2">Cost of a Single Failure Event</h2>
+                        <p class="text-slate-600 mb-4">
+                            These costs are avoided with <strong>Transient Discriminating (TD) Technology</strong> 
+                            which can withstand Temporary Overvoltages that would damage competitor products.
+                        </p>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Downtime Cost per Hour</label>
+                                <div class="space-y-2">
+                                    <input type="range" id="downtimeCostSlider" min="500" max="20000" value="2000" 
+                                           class="w-full h-2 slider-sync">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-slate-500">$500</span>
+                                        <div class="relative">
+                                            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">$</span>
+                                            <input type="number" id="downtimeCostInput" value="2000" min="500" max="20000"
+                                                   class="pl-8 pr-3 py-1 border border-slate-300 rounded w-24 text-center focus:ring-2 focus:ring-nvent-orange focus:border-transparent">
+                                        </div>
+                                        <span class="text-sm text-slate-500">$20,000</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Hours of Downtime per Event</label>
+                                <div class="space-y-2">
+                                    <input type="range" id="downtimeHoursSlider" min="1" max="48" value="4" 
+                                           class="w-full h-2 slider-sync">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-slate-500">1 hr</span>
+                                        <input type="number" id="downtimeHoursInput" value="4" min="1" max="48"
+                                               class="px-3 py-1 border border-slate-300 rounded w-20 text-center focus:ring-2 focus:ring-nvent-orange focus:border-transparent">
+                                        <span class="text-sm text-slate-500">48 hrs</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Value of Damaged Equipment</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">$</span>
+                                    <input type="number" id="equipmentDamageCost" value="2500" 
+                                           class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-nvent-orange focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results -->
+                <div class="lg:col-span-3 space-y-6">
+                    <!-- Section 1: The ERICO Advantage Callout -->
+                    <div class="bg-orange-50 border-2 border-nvent-orange rounded-lg p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-nvent-orange rounded-full flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-lg font-semibold text-nvent-dark-gray">The ERICO Advantage: TD Technology</h3>
+                                <p class="text-slate-600 mt-1">
+                                    The results shown below are made possible by our proprietary 
+                                    <strong>Transient Discriminating (TD) Technology</strong> which provides 
+                                    superior protection against temporary overvoltages.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Key Metrics (KPI Cards) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-nvent-red">
+                            <h3 class="text-lg font-semibold text-nvent-dark-gray mb-2">Cost of ONE Failure Event</h3>
+                            <div class="text-3xl font-bold text-nvent-red" id="totalFailureCost">$10,500</div>
+                            <p class="text-sm text-nvent-dark-red mt-1">Avoided with TD Technology</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-nvent-gold">
+                            <h3 class="text-lg font-semibold text-nvent-dark-gray mb-2">Return on Investment (ROI)</h3>
+                            <div class="text-3xl font-bold text-nvent-gold" id="roi">10,400%</div>
+                            <p class="text-sm text-slate-600 mt-1">On additional investment</p>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: TCO Comparison Chart -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-semibold text-nvent-dark-gray mb-4">Total Cost of Ownership Comparison</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium text-slate-700">ERICO EDT2</span>
+                                    <span class="text-sm font-bold text-nvent-dark-gray" id="ericoTcoDisplay">$500</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-8">
+                                    <div id="ericoBar" class="bg-nvent-orange h-8 rounded-full flex items-center justify-center bar-animation" style="width: 5%;">
+                                        <span class="text-black font-bold text-sm">Initial Cost</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium text-slate-700">Competitor</span>
+                                    <span class="text-sm font-bold text-nvent-dark-gray" id="competitorTcoDisplay">$10,900</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-8">
+                                    <div id="competitorBar" class="bg-nvent-red h-8 rounded-full flex items-center justify-center bar-animation" style="width: 100%;">
+                                        <span class="text-white font-bold text-sm">Initial Cost + Cost of One Failure</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Summary & Value Proposition -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-semibold text-nvent-dark-gray mb-4">Financial Summary</h3>
+                        <div class="prose text-slate-600" id="summaryText">
+                            <p>
+                                While the ERICO EDT2 requires an additional investment of <strong class="text-nvent-orange">$100</strong> 
+                                compared to the competitor, this investment pays for itself immediately. 
+                                The <strong>Transient Discriminating (TD) Technology</strong> prevents failure events 
+                                that would cost <strong class="text-nvent-red">$10,500</strong>, delivering an 
+                                exceptional <strong class="text-nvent-gold">10,400% ROI</strong> on your additional investment.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/calculator.js"></script>
+</body>
+</html>
