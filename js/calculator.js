@@ -58,6 +58,54 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeSliders() {
+    // Sync ERICO unit cost slider and input
+    const ericoUnitCostSlider = document.getElementById('ericoUnitCostSlider');
+    const ericoUnitCostInput = document.getElementById('ericoUnitCost');
+    
+    ericoUnitCostSlider.addEventListener('input', function() {
+        ericoUnitCostInput.value = this.value;
+        calculate();
+    });
+    
+    ericoUnitCostInput.addEventListener('input', function() {
+        const value = Math.max(100, Math.min(500, parseInt(this.value) || 150));
+        this.value = value;
+        ericoUnitCostSlider.value = value;
+        calculate();
+    });
+    
+    // Sync competitor unit cost slider and input
+    const competitorUnitCostSlider = document.getElementById('competitorUnitCostSlider');
+    const competitorUnitCostInput = document.getElementById('competitorUnitCost');
+    
+    competitorUnitCostSlider.addEventListener('input', function() {
+        competitorUnitCostInput.value = this.value;
+        calculate();
+    });
+    
+    competitorUnitCostInput.addEventListener('input', function() {
+        const value = Math.max(50, Math.min(300, parseInt(this.value) || 100));
+        this.value = value;
+        competitorUnitCostSlider.value = value;
+        calculate();
+    });
+    
+    // Sync installation cost slider and input
+    const installCostSlider = document.getElementById('installCostSlider');
+    const installCostInput = document.getElementById('installCost');
+    
+    installCostSlider.addEventListener('input', function() {
+        installCostInput.value = this.value;
+        calculate();
+    });
+    
+    installCostInput.addEventListener('input', function() {
+        const value = Math.max(50, Math.min(400, parseInt(this.value) || 150));
+        this.value = value;
+        installCostSlider.value = value;
+        calculate();
+    });
+    
     // Sync downtime cost slider and input
     const downtimeCostSlider = document.getElementById('downtimeCostSlider');
     const downtimeCostInput = document.getElementById('downtimeCostInput');
@@ -68,7 +116,7 @@ function initializeSliders() {
     });
     
     downtimeCostInput.addEventListener('input', function() {
-        const value = Math.max(500, Math.min(20000, parseInt(this.value) || 500));
+        const value = Math.max(500, Math.min(200000, parseInt(this.value) || 500));
         this.value = value;
         downtimeCostSlider.value = value;
         calculate();
@@ -87,6 +135,22 @@ function initializeSliders() {
         const value = Math.max(1, Math.min(48, parseInt(this.value) || 1));
         this.value = value;
         downtimeHoursSlider.value = value;
+        calculate();
+    });
+    
+    // Sync equipment damage slider and input
+    const equipmentDamageSlider = document.getElementById('equipmentDamageSlider');
+    const equipmentDamageInput = document.getElementById('equipmentDamageCost');
+    
+    equipmentDamageSlider.addEventListener('input', function() {
+        equipmentDamageInput.value = this.value;
+        calculate();
+    });
+    
+    equipmentDamageInput.addEventListener('input', function() {
+        const value = Math.max(1000, Math.min(100000, parseInt(this.value) || 2500));
+        this.value = value;
+        equipmentDamageSlider.value = value;
         calculate();
     });
 }
@@ -124,15 +188,19 @@ function loadIndustryPreset(industryKey) {
     const preset = industryPresets[industryKey];
     if (!preset) return;
     
-    // Update all input fields with preset values
+    // Update all input fields and sliders with preset values
     document.getElementById('ericoUnitCost').value = preset.ericoUnitCost;
+    document.getElementById('ericoUnitCostSlider').value = preset.ericoUnitCost;
     document.getElementById('competitorUnitCost').value = preset.competitorUnitCost;
+    document.getElementById('competitorUnitCostSlider').value = preset.competitorUnitCost;
     document.getElementById('installCost').value = preset.installCost;
+    document.getElementById('installCostSlider').value = preset.installCost;
     document.getElementById('downtimeCostInput').value = preset.downtimeCostPerHour;
     document.getElementById('downtimeCostSlider').value = preset.downtimeCostPerHour;
     document.getElementById('downtimeHoursInput').value = preset.downtimeHours;
     document.getElementById('downtimeHoursSlider').value = preset.downtimeHours;
     document.getElementById('equipmentDamageCost').value = preset.equipmentDamageCost;
+    document.getElementById('equipmentDamageSlider').value = preset.equipmentDamageCost;
     
     // Update section description to show current selection
     updateSectionDescription(preset.name, preset.description);
@@ -203,7 +271,9 @@ function calculate() {
         roi,
         ericoTco,
         competitorTco,
-        additionalCostForErico
+        additionalCostForErico,
+        ericoInitialInvestment,
+        competitorInitialInvestment
     });
 }
 
@@ -226,11 +296,29 @@ function updateResults(results) {
     document.getElementById('ericoTcoDisplay').textContent = formatCurrency(results.ericoTco);
     document.getElementById('competitorTcoDisplay').textContent = formatCurrency(results.competitorTco);
     
+    // Update cost comparison in Initial Investment section
+    const ericoTotalElement = document.getElementById('ericoTotalCost');
+    const competitorTotalElement = document.getElementById('competitorTotalCost');
+    const costComparisonBarElement = document.getElementById('costComparisonBar');
+    
+    if (ericoTotalElement && competitorTotalElement && costComparisonBarElement) {
+        ericoTotalElement.textContent = formatCurrency(results.ericoInitialInvestment);
+        competitorTotalElement.textContent = formatCurrency(results.competitorInitialInvestment);
+        
+        // Calculate percentage for comparison bar
+        const maxCost = Math.max(results.ericoInitialInvestment, results.competitorInitialInvestment);
+        const ericoPercentage = (results.ericoInitialInvestment / maxCost) * 100;
+        costComparisonBarElement.style.width = `${ericoPercentage}%`;
+    }
+    
+    // Update damage meter
+    updateDamageMeter(results.totalFailureCost);
+    
+    // Update breakdown displays
+    updateBreakdownDisplays(results);
+    
     // Update chart bars
     updateChart(results.ericoTco, results.competitorTco);
-    
-    // Update summary text
-    updateSummary(results);
     
     // Remove fade-in class after animation
     setTimeout(() => {
@@ -239,18 +327,89 @@ function updateResults(results) {
     }, 300);
 }
 
+function updateDamageMeter(totalFailureCost) {
+    const damageMeterElement = document.getElementById('damageMeters');
+    const riskLevelElement = document.getElementById('riskLevel');
+    
+    if (!damageMeterElement || !riskLevelElement) return;
+    
+    // Calculate risk level based on total failure cost
+    let riskLevel, riskText, riskPercentage;
+    
+    if (totalFailureCost <= 10000) {
+        riskLevel = 'LOW';
+        riskText = 'text-yellow-600';
+        riskPercentage = 25;
+    } else if (totalFailureCost <= 50000) {
+        riskLevel = 'MODERATE';
+        riskText = 'text-orange-600';
+        riskPercentage = 50;
+    } else if (totalFailureCost <= 200000) {
+        riskLevel = 'HIGH';
+        riskText = 'text-red-600';
+        riskPercentage = 75;
+    } else {
+        riskLevel = 'CRITICAL';
+        riskText = 'text-red-800';
+        riskPercentage = 100;
+    }
+    
+    // Update risk level text and color
+    riskLevelElement.textContent = riskLevel;
+    riskLevelElement.className = `font-bold ${riskText}`;
+    
+    // Update damage meter bar
+    damageMeterElement.style.width = `${riskPercentage}%`;
+}
+
+function updateBreakdownDisplays(results) {
+    // Update ERICO breakdown
+    const ericoInitialBreakdown = document.getElementById('ericoInitialBreakdown');
+    const ericoTotalBreakdown = document.getElementById('ericoTotalBreakdown');
+    
+    if (ericoInitialBreakdown && ericoTotalBreakdown) {
+        ericoInitialBreakdown.textContent = formatCurrency(results.ericoInitialInvestment);
+        ericoTotalBreakdown.textContent = formatCurrency(results.ericoTco);
+    }
+    
+    // Update Competitor breakdown
+    const competitorInitialBreakdown = document.getElementById('competitorInitialBreakdown');
+    const competitorFailureBreakdown = document.getElementById('competitorFailureBreakdown');
+    const competitorTotalBreakdown = document.getElementById('competitorTotalBreakdown');
+    
+    if (competitorInitialBreakdown && competitorFailureBreakdown && competitorTotalBreakdown) {
+        competitorInitialBreakdown.textContent = formatCurrency(results.competitorInitialInvestment);
+        competitorFailureBreakdown.textContent = formatCurrency(results.totalFailureCost);
+        competitorTotalBreakdown.textContent = formatCurrency(results.competitorTco);
+    }
+}
+
 function updateChart(ericoTco, competitorTco) {
+    // Update the new vertical bars
     const maxValue = Math.max(ericoTco, competitorTco);
+    const ericoBarVertical = document.getElementById('ericoBarVertical');
+    const competitorBarVertical = document.getElementById('competitorBarVertical');
+    
+    if (ericoBarVertical && competitorBarVertical) {
+        // Calculate percentages for bar heights
+        const ericoHeight = (ericoTco / maxValue) * 100;
+        const competitorHeight = (competitorTco / maxValue) * 100;
+        
+        // Update bar heights with animation
+        ericoBarVertical.style.height = `${Math.max(ericoHeight, 10)}%`; // Minimum 10% for visibility
+        competitorBarVertical.style.height = `${competitorHeight}%`;
+    }
+    
+    // Also update legacy horizontal bars if they exist
     const ericoBar = document.getElementById('ericoBar');
     const competitorBar = document.getElementById('competitorBar');
     
-    // Calculate percentages for bar widths
-    const ericoWidth = (ericoTco / maxValue) * 100;
-    const competitorWidth = (competitorTco / maxValue) * 100;
-    
-    // Update bar widths with animation
-    ericoBar.style.width = `${Math.max(ericoWidth, 15)}%`; // Minimum 15% for visibility
-    competitorBar.style.width = `${competitorWidth}%`;
+    if (ericoBar && competitorBar) {
+        const ericoWidth = (ericoTco / maxValue) * 100;
+        const competitorWidth = (competitorTco / maxValue) * 100;
+        ericoBar.style.width = `${Math.max(ericoWidth, 15)}%`;
+        competitorBar.style.width = `${competitorWidth}%`;
+    }
 }
 
 function updateSummary(results) {
